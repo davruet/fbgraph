@@ -178,8 +178,9 @@ function makeDOT(){
     });
     combined = nodeDOT.concat(edgeDOT);
     s = combined.join('\n')
+    s = 'graph {' + s + "}'
     console.log(s);
-    document.myform.outputtext = s
+    document.myform.outputtext.value = s
 }
 </script>
 
