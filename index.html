@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graph</title>
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script type="text/javascript" src="d3/d3.geom.js"></script>
+    <script type="text/javascript" src="d3/d3.layout.js"></script>
+    <script type="text/javascript" src="force.js"></script>
+    <script src="http://connect.facebook.net/en_US/all.js#appId=266768502389"></script>
+	<!--<script src="SVGPan.js"/>-->
+    <link type="text/css" rel="stylesheet" href="force.css"/>
+    <link type="text/css" rel="stylesheet" href="constellation.css"/>
+  </head>
+  <body>
+  
+  	<div id="topbar">	
+		<div id="login"><fb:login-button size="large" onlogin="onlogin()"></fb:login-button></div>
+		<div id="about"><a href="about.html">about</a></div>
+		<div id="status"></div>
+	</div>
+  	<div id="fb-root"></div> 
+	<div id="test"></div> 
+	<div id="chart"></div>
+	<!---->
+
+
+<script type="text/javascript">
+	var links = new Array();
+	var nodes = new Array();
+	var graphData = {"nodes":nodes, "links":links};
+	
+	var linkRegister = {};
+		
+	var idTable = new Array();
+	var accessToken = "";
+	var batchSize = 20;
+	
+	var statusField = d3.select("#status")
+	
+	var totalBatchCount = 0;
+	var remainingBatchCount = 0;
+	
+	var loginElement = d3.select("#login");
+	
+	var graph = new ForceGraph(graphData);
+	
+	d3.ns.prefix['fb'] = "http://www.facebook.com";
+	
+	function updateLoginStatus(status){
+		console.log(status);
+		//alert(JSON.stringify(status));
+		if (status){
+			loginElement.html("");
+			loginElement.append("a").attr("href", "javascript:logout()").text("logout");
+			initFriendGraph();
+		} else {
+			/*loginElement.html("");
+			loginElement.append("fb:login-button").attr("onlogin","onlogin()");
+			FB.XFBML.parse();*/
+		}
+	}
+	
+	function logout(){
+		FB.logout();
+		window.href = window.href;
+	}
+	
+	function onlogin(){
+		updateLoginStatus(FB.getAuthResponse());
+		initFriendGraph();
+	}
+	
+	function initFriendGraph(){
+		statusField.text("Requesting friends from FB API...");
+		//alert(JSON.stringify(FB.getSession()));
+		accessToken = FB.getAuthResponse().access_token;
+    	FB.api('/me/friends', function(response) {
+    		if (response.error) console.log("Error retrieving friend list: " + response.error.message);
+    		console.log("Friend request returned, size=" + response.data.length);
+    		var friends = response.data;
+    		
+    		remainingBatchCount = 0;
+    		totalBatchCount = 0;
+    		
+    		for (i = 0; i < friends.length; i++){
+    			nodes[i] = {"name" :friends[i].name, "id" : friends[i].id, "image" : "http://graph.facebook.com/" + friends[i].id + "/picture"};
+    			idTable[friends[i].id] = i;
+    		}
+			
+			for (k = 0; k < friends.length; k += batchSize){
+				var slice = friends.slice(k, k+ batchSize);
+				var idList = slice.map(function(d) {
+					return d.id;
+				});
+				addMutualFriends(idList);
+				totalBatchCount++;
+				remainingBatchCount++;
+			}
+			
+    		
+    		
+    	});
+    	
+    }
+    
+    
+    function addMutualFriends(friendIds){
+    	var queries = new Array(friendIds.length);
+    	for (x = 0; x < friendIds.length; x++){
+			queries[x] = { method: 'GET', relative_url: 'me/mutualfriends/' + friendIds[x]};
+		}
+		//console.log("Access token: " + accessToken);
+		statusField.text("Requesting friend connections...");
+		FB.api('/', 'POST', {
+        		batch: queries
+    		}, 
+			function(friendResponse) {
+				//console.log("got a response.");
+				console.log(friendResponse);
+				//console.log("mutual friends of " + JSON.stringify(friendIds) + ": " + JSON.stringify(friendResponse));
+				for (y = 0; y < friendResponse.length; y++){
+					var mutuals = friendResponse[y].body;
+					//console.log(mutuals);
+					mutuals = JSON.parse(mutuals);
+					mutuals = mutuals.data;
+					var sourceIndex = idTable[friendIds[y]];
+					//console.log("mutuals: " + JSON.stringify(mutuals));
+					for (z = 0; z < mutuals.length; z++){ 
+						var targetIndex = idTable[mutuals[z].id + ""];
+						var uniqueId;
+						if (targetIndex < sourceIndex){
+							uniqueId = targetIndex + ":" + sourceIndex;
+						} else {
+							uniqueId = sourceIndex + ":" + targetIndex;
+						}
+						if (!linkRegister[uniqueId]){
+							var link = {"target":targetIndex, "source":sourceIndex};
+							links.push(link);
+							linkRegister[uniqueId] = true;
+						} 
+						//initGraph(graphData);
+						//console.log("added link: " + JSON.stringify(link));
+					}
+				}
+				remainingBatchCount--;
+				if (remainingBatchCount > 0){
+					statusField.text("Loading friend connections - loaded " + (totalBatchCount - remainingBatchCount) + " of " + totalBatchCount);
+				} else {
+					statusField.text("");
+				}
+				graph.update();
+						
+			}
+		);
+					
+    }
+    
+    window.onresize = function(event) {
+    if (graph){
+    	graph.setSize(document.body.clientWidth, 900);
+    }
+}
+</script>
+
+<script>
+	window.fbAsyncInit = function() {
+		FB.init({
+		appId  : '266768502389',
+		status : true, // check login status
+		cookie : true, // enable cookies 
+	    xfbml  : true,  // parse XFBML
+	    ifUserConnected: initFriendGraph,
+		channelUrl : 'http://davidrueter.com/static/facebook/channel.html'
+		});
+		statusField.text("");
+		
+		FB.getLoginStatus(function(response){
+			updateLoginStatus(response.session);	
+		});
+	};
+	statusField.text("Initializing API...");
+	(function() {
+		var e = document.createElement('script');
+		e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+		e.async = true;
+		document.getElementById('fb-root').appendChild(e);
+	 } ()
+	 );
+
+</script>
+    
+
+
+    
+  </body>
+</html>

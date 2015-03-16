@@ -1,0 +1,48 @@
+body {
+	background-color:#000915;
+	color:white;
+	margin:0 0 0 0;
+}
+
+a:link {color:white;}
+a:visited {color:white;}
+a:hover {color:white;}
+a:active {color:white;}
+
+div#topbar {
+	position:absolute;
+	width:100%;
+	background-color:#333;
+	padding: 5px 5px 5px 5px;
+}
+
+div#status {
+	position:relative;
+	margin-right:auto;
+	margin-left:auto;
+	display:inline;
+}
+
+div#login {
+	position:relative;
+	float:left;
+	display:inline;
+	margin:0 10px 0 0;
+}
+div#about {
+	position:relative;
+	float:left;
+	display:inline;
+	margin:0 10px 0 0;
+}
+
+g.node circle{
+  stroke-opacity:0;
+  fill:#fff;
+}
+
+line.link {
+	stroke: #fff;
+	stroke-opacity: 0.15;
+}
+

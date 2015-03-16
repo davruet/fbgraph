@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     id="canvas" 
+     width="1000" 
+     height="600">
+    
+     <g id="group" transform="translate(0, 60)">
+     	<defs>
+     	<clipPath id="path">
+     		<circle id="circle" cx="0" cy="0" r="10" />
+     	</clipPath>
+     	</defs>
+     	<!-- Uncommenting the below line makes the bug disappear -->
+     	<!--<circle fill="#000" cx="0" cy="0" r="60" clip-path="url(#path)"/>-->
+
+     	<image xlink:href="http://www.google.com/favicon.ico" x="-30" y="-30" width="60" height="60" clip-path="url(#path)"/>
+    	
+    </g>
+</svg>
+
+<script>
+	circle = document.getElementById("circle");
+	group = document.getElementById("group");
+	animator = function(){
+		circle.setAttribute("r", 15 * (1 + Math.sin(new Date().getTime() / 1000)));
+		group.setAttribute("transform","translate(" + (315 + 300 * (Math.sin(new Date().getTime() / 2000))) + ",60)");
+	}
+	window.setInterval(animator, 30);
+</script>

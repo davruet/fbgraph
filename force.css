@@ -1,0 +1,12 @@
+#g.node circle.outline {
+#  stroke: #fff;
+#  stroke-width: 1.5px;
+#  
+#}
+
+line.link {
+  stroke: #999;
+  stroke-opacity: 0.2;
+}
+
+
