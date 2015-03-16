@@ -174,7 +174,7 @@ function makeDOT(){
                         return x.id + ' [label="' + x['name'] + '" image="' + x['image'] + '"];'
                         });
     edgeDOT = edges.map(function(x) {
-                        return x['source']['id'] + " -- " + x['target']['id'];
+                        return x['source']['id'] + " -- " + x['target']['id'] + ';';
     });
     combined = nodeDOT.concat(edgeDOT);
     s = combined.join('\n');
