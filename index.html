@@ -176,8 +176,8 @@ function makeDOT(){
     edgeDOT = edges.map(function(x) {
                         return x['source']['id'] + " - " + x['target']['id'];
     });
-    nodeDOT.concat(edgeDOT);
-    console.log(nodeDOT.join('\n'));
+    combined = nodeDOT.concat(edgeDOT);
+    console.log(combined.join('\n'));
 }
 </script>
 
