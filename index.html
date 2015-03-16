@@ -17,6 +17,7 @@
   	<div id="topbar">	
 		<div id="login"><fb:login-button size="large" onlogin="onlogin()"></fb:login-button></div>
 		<div id="about"><a href="about.html">about</a></div>
+        <div id="DOT"><a href="javascript:makeDOT()">get DOT format</a></div>
 		<div id="status"></div>
 	</div>
   	<div id="fb-root"></div> 
@@ -45,6 +46,9 @@
 	
 	var graph = new ForceGraph(graphData);
 	
+    var graphDOT = ""
+    
+    
 	d3.ns.prefix['fb'] = "http://www.facebook.com";
 	
 	function updateLoginStatus(status){
@@ -160,6 +164,20 @@
     if (graph){
     	graph.setSize(document.body.clientWidth, 900);
     }
+}
+    
+function makeDOT(){
+    nodes = graphData['nodes'];
+    edges = graphData['edges'];
+    
+    nodeDOT = nodes.map(function(x) {
+                        return x.id + ' [label="' + x['name'] + '" image="' + x['image'] + '"];'
+                        });
+    edgeDOT = edges.map(function(x) {
+                        return + nodes[x['source']]['id'] + " - " + nodes[x['target']]['id'];
+    });
+    nodeDOT.concat(edgeDOT);
+    console.log(nodeDOT.join('\n'));
 }
 </script>
 
