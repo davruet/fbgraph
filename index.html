@@ -168,7 +168,7 @@
     
 function makeDOT(){
     nodes = graphData['nodes'];
-    edges = graphData['edges'];
+    edges = graphData['links'];
     
     nodeDOT = nodes.map(function(x) {
                         return x.id + ' [label="' + x['name'] + '" image="' + x['image'] + '"];'
