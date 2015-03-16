@@ -174,10 +174,12 @@ function makeDOT(){
                         return x.id + ' [label="' + x['name'] + '" image="' + x['image'] + '"];'
                         });
     edgeDOT = edges.map(function(x) {
-                        return x['source']['id'] + " - " + x['target']['id'];
+                        return x['source']['id'] + " -- " + x['target']['id'];
     });
     combined = nodeDOT.concat(edgeDOT);
-    console.log(combined.join('\n'));
+    s = combined.join('\n')
+    console.log(s);
+    document.myform.outputtext = s
 }
 </script>
 
@@ -208,8 +210,8 @@ function makeDOT(){
 
 </script>
     
-
-
-    
+<form name="myform">
+<textarea name="outputtext"></textarea>
+</form>
   </body>
 </html>
