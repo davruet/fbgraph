@@ -177,8 +177,8 @@ function makeDOT(){
                         return x['source']['id'] + " -- " + x['target']['id'];
     });
     combined = nodeDOT.concat(edgeDOT);
-    s = combined.join('\n')
-    s = 'graph {' + s + "}'
+    s = combined.join('\n');
+    s = 'graph {' + s + "}';
     console.log(s);
     document.myform.outputtext.value = s;
 }
